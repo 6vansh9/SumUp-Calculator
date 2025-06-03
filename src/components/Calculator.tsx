@@ -1,11 +1,54 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Calculator = () => {
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState<number | null>(null);
   const [operation, setOperation] = useState<string | null>(null);
   const [waitingForOperand, setWaitingForOperand] = useState(false);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      const key = event.key;
+      
+      // Handle number keys
+      if (key >= '0' && key <= '9') {
+        inputNumber(key);
+      }
+      // Handle operator keys
+      else if (key === '+') {
+        inputOperator('+');
+      }
+      else if (key === '-') {
+        inputOperator('-');
+      }
+      else if (key === '*') {
+        inputOperator('*');
+      }
+      else if (key === '/') {
+        event.preventDefault(); // Prevent browser search
+        inputOperator('/');
+      }
+      // Handle equals and enter
+      else if (key === '=' || key === 'Enter') {
+        performCalculation();
+      }
+      // Handle decimal point
+      else if (key === '.') {
+        inputDecimal();
+      }
+      // Handle clear/escape
+      else if (key === 'Escape' || key === 'c' || key === 'C') {
+        clear();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [display, previousValue, operation, waitingForOperand]);
 
   const inputNumber = (num: string) => {
     if (waitingForOperand) {
@@ -21,7 +64,7 @@ const Calculator = () => {
 
     if (previousValue === null) {
       setPreviousValue(inputValue);
-    } else if (operation) {
+    } else if (operation && !waitingForOperand) {
       const currentValue = previousValue || 0;
       const newValue = calculate(currentValue, inputValue, operation);
 
@@ -49,7 +92,7 @@ const Calculator = () => {
   };
 
   const performCalculation = () => {
-    if (previousValue !== null && operation) {
+    if (previousValue !== null && operation && !waitingForOperand) {
       const inputValue = parseFloat(display);
       const newValue = calculate(previousValue, inputValue, operation);
       
@@ -77,9 +120,9 @@ const Calculator = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-2xl p-6 w-80">
+    <div className="bg-gray-800 rounded-lg shadow-2xl p-6 w-80 border border-gray-700">
       <div className="mb-4">
-        <div className="bg-gray-900 text-white p-4 rounded text-right text-2xl font-mono min-h-[60px] flex items-center justify-end">
+        <div className="bg-gray-900 text-white p-4 rounded text-right text-2xl font-mono min-h-[60px] flex items-center justify-end border border-gray-600">
           {display}
         </div>
       </div>
@@ -88,19 +131,19 @@ const Calculator = () => {
         {/* First Row */}
         <button
           onClick={clear}
-          className="col-span-2 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded transition-colors"
+          className="col-span-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded transition-colors border border-red-500"
         >
           Clear
         </button>
         <button
           onClick={() => inputOperator('/')}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-500"
         >
           ÷
         </button>
         <button
           onClick={() => inputOperator('*')}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-500"
         >
           ×
         </button>
@@ -108,25 +151,25 @@ const Calculator = () => {
         {/* Second Row */}
         <button
           onClick={() => inputNumber('7')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           7
         </button>
         <button
           onClick={() => inputNumber('8')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           8
         </button>
         <button
           onClick={() => inputNumber('9')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           9
         </button>
         <button
           onClick={() => inputOperator('-')}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-500"
         >
           −
         </button>
@@ -134,25 +177,25 @@ const Calculator = () => {
         {/* Third Row */}
         <button
           onClick={() => inputNumber('4')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           4
         </button>
         <button
           onClick={() => inputNumber('5')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           5
         </button>
         <button
           onClick={() => inputNumber('6')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           6
         </button>
         <button
           onClick={() => inputOperator('+')}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-500"
         >
           +
         </button>
@@ -160,25 +203,25 @@ const Calculator = () => {
         {/* Fourth Row */}
         <button
           onClick={() => inputNumber('1')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           1
         </button>
         <button
           onClick={() => inputNumber('2')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           2
         </button>
         <button
           onClick={() => inputNumber('3')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           3
         </button>
         <button
           onClick={performCalculation}
-          className="row-span-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded transition-colors"
+          className="row-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition-colors border border-green-500"
         >
           =
         </button>
@@ -186,13 +229,13 @@ const Calculator = () => {
         {/* Fifth Row */}
         <button
           onClick={() => inputNumber('0')}
-          className="col-span-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="col-span-2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           0
         </button>
         <button
           onClick={inputDecimal}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition-colors"
+          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded transition-colors border border-gray-600"
         >
           .
         </button>
